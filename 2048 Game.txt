@@ -1,0 +1,288 @@
+from time import time
+import random
+from sys import stdin, setrecursionlimit
+setrecursionlimit(10 ** 6)
+#USING TWO VARIABLES
+def maxmin(i,j,a,li):
+    
+    
+        if i==j:
+            max=min=a[i]
+            print(max,min)
+            li.append(max)
+            return li
+        
+        
+        elif (i==j-1):
+            if a[i]<a[j]:
+                max=a[j]
+                min=a[i]
+            else:
+                max=a[i]
+                min=a[j]
+                
+            li.append(max)
+            li.append(min)
+            print(max,min)
+            return li
+
+        else:
+            mid=(i+j)//2
+
+            li=maxmin(i,mid,a,li)
+            min=li.pop()
+            max=li.pop()
+            li=maxmin(mid+1,j,a,li)
+            min1=li.pop()
+            max1=li.pop()
+
+
+
+            if max<max1:
+                newmax=max1
+            else:
+                newmax=max
+
+            if min<min1:
+                newmin=min
+            else:
+                newmin=min1
+                
+            li.append(newmax)
+            li.append(newmin)
+                
+
+            print(newmax,newmin)
+            return li
+       
+
+    
+    
+array=[5,8,3,2,2,6,-7,-7]
+li=[]
+t1=time()
+max,min=maxmin(0,7,array,li)
+t2=time()
+print("Max value is :",max)
+print("Min value is :",min)
+print("Time taken is :",(t2-t1))
+
+from time import time
+import random
+from sys import stdin, setrecursionlimit
+setrecursionlimit(10 ** 6)
+#WITHOUT USING DIFFERENT ARRAY
+def maxmin(i,j,a):
+    
+    
+        if i==j:
+            max=min=a[i]
+            
+            print(max,min)
+            return max,min
+        
+        
+        elif (i==j-1):
+            if a[i]<a[j]:
+                max=a[j]
+                min=a[i]
+               
+            else:
+                max=a[i]
+                min=a[j]
+               
+            print(max,min)
+            return max,min
+
+        else:
+            mid=(i+j)//2
+
+            max,min=maxmin(i,mid,a)
+            max1,min1=maxmin(mid+1,j,a)
+
+
+
+            if max<max1:
+                newmax=max1
+            else:
+                newmax=max
+
+            if min<min1:
+                newmin=min
+            else:
+                newmin=min1
+                
+
+            print(newmax,newmin)
+            return newmax,newmin
+       
+
+    
+    
+#array=[5,8,3,2,4,6,7,10]
+n=int(input())
+
+array = [random.randint(0,10) for i in range(n)]
+t1=time()
+max,min=maxmin(0,7,array)
+t2=time()
+print("Max value is :",max)
+print("Min value is :",min)
+print("Time taken is :",(t2-t1))
+
+
+import random
+def start_game():
+    mat=[]
+    for i in range(4):
+        mat.append([0]*4)
+        
+    return mat
+
+def add_new_2(mat):
+    r=random.randint(0,3)
+    
+    c=random.randint(0,3)
+    while mat[r][c] !=0:
+         r=random.randint(0,3)
+    
+         c=random.randint(0,3)
+    mat[r][c]=2
+def compress(mat):
+    changed=False
+    new_mat=[]
+    for i in range(4):
+            new_mat.append([0]*4)
+            for j in range(4):
+                pos=0
+                for j in range(4):
+                    if mat[i][j] !=0:
+                        new_mat[i][pos]=mat[i][j]
+                        if j!=pos:
+                            changed=True
+                        pos+=1   
+    return new_mat,changed   
+def merge(mat):
+    changed=False
+    for i in range(4):
+        for j in range(3):
+            if (mat[i][j]==mat[i][j+1]  and mat[i][j]!=0):
+                mat[i][j]=mat[i][j]*2
+                mat[i][j+1]=0
+                changed=True
+    return mat,changed           
+def reverse(mat):
+    
+    new_mat=[]
+    for i in range(4):
+        new_mat.append([])
+        for j in range(4):
+            new_mat[i].append(mat[i][4-j-1])
+    return new_mat        
+def transpose(mat):
+    new_mat=[]
+    for i in range(4):
+        new_mat.append([])
+        for j in range(4):
+            new_mat[i].append(mat[j][i])
+    return new_mat  
+    
+def get_current_state(mat):
+    for i in range(4):
+        for j in range(4):
+            if (mat[i][j]==2048):
+                return "WON"
+            
+    for i in range(4):
+        for j in range(4):
+            if (mat[i][j]==2048):
+                return "GAME NOT OVER"
+    for i in range(3):
+        for j in range(3):
+            if (mat[i][j]==mat[i+1][j] or mat[i][j]==mat[i][j+1]):
+                return "GAME NOT OVER"
+    for j in range(3):
+        if mat[3][j]==mat[3][j+1]:
+            return "GAME NOT OVRER"
+        
+    for i in range(3):
+        if mat[i][3]==mat[i+1][3]:
+            return "GAME NOT OVER"
+    return "LOST"   
+
+def move_left(mat):
+    new_mat,changed1=compress(mat)
+    new_mat,changed2=merge(new_mat)
+    changed=changed1 or changed2
+    new_mat,temp=compress(new_mat)
+    return new_mat,changed
+
+def move_right(mat):
+    rev_mat=reverse(mat)
+    new_mat,changed1=compress(mat)
+    new_mat,changed2=merge(new_mat)
+    changed=changed1 or changed2
+    new_mat,temp=compress(new_mat)
+
+    new_mat=reverse(new_mat)
+    return new_mat,changed
+
+def move_up(mat):
+    new_mat=transpose(mat)
+    new_mat,changed1=compress(mat)
+    new_mat,changed2=merge(new_mat)
+    changed=changed1 or changed2
+    new_mat,temp=compress(new_mat)
+  
+    new_mat=transpose(new_mat)
+    return new_mat,changed
+
+def move_down(mat):
+    new_mat=transpose(mat)
+    new_mat=reverse(new_mat)
+    new_mat,changed1=compress(mat)
+    new_mat,changed2=merge(new_mat)
+    changed=changed1 or changed2
+    new_mat,temp=compress(new_mat)
+
+    new_mat=reverse(new_mat)
+    new_mat=transpose(new_mat)
+    return new_mat,changed
+
+mat=start_game()
+print(mat)
+
+add_new_2(mat)
+add_new_2(mat)
+print(mat)
+
+mat=move_up(mat)
+print(mat)
+
+mat=move_down(mat)
+mat=move_left(mat)
+mat=move_right(mat)
+print(mat)
+
+SIZE=400
+GRID_LEN=4
+GRID_PADDING=10
+BACKGROUND_COLOR_GAME="#92877d"
+BACKGROUND_COLOR_CELL_EMPTY="#9e948a"
+
+BACKGROUND_COLOR_DICT={ 2:"#eee4da" , 4:"#ede0c8" , 8:"#f2b179",
+                      16:"#f59563", 32:"#f67c5f" , 64:"#f65e3b",
+                      128:"#edcf72" , 256:"#edcc61", 512:"# edc850",
+                      1024:"# edc53f" , 2048:"#edc22e",}
+CELL_COLOR_DICT={ 2:"#776e65" , 4:"#776e65" , 8:"#f9f6f2",
+                      16:"#f9f6f2", 32:"#f9f6f2" , 64:"#f9f6f2",
+                      128:"#f9f6f2" , 256:"#f9f6f2", 512:"# f9f6f2",
+                      1024:"# f9f6f2" , 2048:"#f9f6f2",}
+FONT=("Verdana",40,"bold")
+KEY_UP="'w'"
+KEY_DOWN="'s'"
+KEY_LEFT="'a'"
+KEY_RIGHT="'d'"
+
+
+
